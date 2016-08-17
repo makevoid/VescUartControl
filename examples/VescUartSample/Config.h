@@ -1,3 +1,10 @@
+#include <VescUart.h>
+#include <printf.h>
+#include <local_datatypes.h>
+#include <buffer.h>
+#include <crc.h>
+#include <datatypes.h>
+
 /*
 Copyright 2015 - 2017 Andreas Chaitidis Andreas.Chaitidis@gmail.com
 This program is free software : you can redistribute it and / or modify
@@ -15,10 +22,13 @@ along with this program.If not, see <http://www.gnu.org/licenses/>.
 //The Config.h is a file, that I use in other programs usualy. So I define also the serial ports there. If you don't want to
 //use it, just comment the include statement in the VescUart.h out.
 
+
+#define DEBUG
+
 #ifndef _CONFIG_h
 #define _CONFIG_h
 
-  #define SERIALIO Serial1  
+  #define SERIALIO Serial1
   #define DEBUGSERIAL Serial
 
 #endif
