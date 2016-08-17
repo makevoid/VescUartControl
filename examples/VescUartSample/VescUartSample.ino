@@ -19,45 +19,51 @@
 #include <SPI.h>
 #include <SD.h>
 
-File myFile;
+File logFile;
 // ---
 
-#define DEBUG
+// #define DEBUG
+
 unsigned long count;
 
 void setup() {
+  pinMode(13, OUTPUT);
+
+
 	//Setup UART port
 	Serial1.begin(115200);
+  Serial.begin(115200);
   #ifdef DEBUG
   	//SEtup debug port
-  	Serial.begin(115200);
-	#endif
-	Serial.println("init ok!!!");
+	  Serial.println("init ok!!!");
+  #endif
 
   // SD Card
   if (!SD.begin(4)) {
-    Serial.println("sd init failed!");
+    #ifdef DEBUG
+      Serial.println("sd init failed!");
+    #endif
     return;
   }
-  Serial.println("sd init done.");
-
-  myFile = SD.open("test.txt", FILE_WRITE);
-
-  if (myFile) {
-    Serial.print("Writing to test.txt...");
-    myFile.println("testing 1, 2, 3.");
-    // myFile.close();
-    Serial.println("done.");
-  } else {
-    Serial.println("error opening test.txt");
-  }
+  #ifdef DEBUG
+    Serial.println("sd init done.");
+  #endif
   // ---
+
+  digitalWrite(13, HIGH);
+  delay(100);
+  digitalWrite(13, LOW);
+  delay(100);
+  digitalWrite(13, HIGH);
+  delay(100);
+  digitalWrite(13, LOW);
 }
 
-struct bldcMeasure measuredValues;
+struct bldcMeasure values;
 
 // the loop function runs over and over again until power down or reset
 void loop() {
+   digitalWrite(13, LOW);
 	//int len=0;
 	//len = ReceiveUartMessage(message);
 	//if (len > 0)
@@ -67,16 +73,67 @@ void loop() {
 	//}
 
   // Vesc values
-	if (VescUartGetValue(measuredValues)) {
-		Serial.print("Loop: "); Serial.println(count++);
-		SerialPrint(measuredValues);
+	if (VescUartGetValue(values)) {
+    #ifdef DEBUG
+		  Serial.print("Loop: "); Serial.println(count++);
+    #endif
 
-    if (myFile) {
-      myFile.println(measuredValues.avgMotorCurrent);
+		SerialPrint(values);
+
+    logFile = SD.open("vesc_log.txt", FILE_WRITE);
+    if (logFile) {
+      #ifdef DEBUG
+      Serial.print("writing to sd");
+      Serial.println("rpm");
+      Serial.println(values.rpm);
+      Serial.println("avgMotorCurrent");
+      Serial.println(values.avgMotorCurrent);
+      #endif
+
+      logFile.print("{");
+      logFile.print("\"t\":");
+      logFile.print(millis());
+      logFile.print(",\"avgMotorCurrent\":");
+      logFile.print(values.avgMotorCurrent);
+      logFile.print(",\"avgInputCurrent\":");
+      logFile.print(values.avgInputCurrent);
+      logFile.print(",\"dutyCycleNow\":");
+      logFile.print(values.dutyCycleNow);
+      logFile.print(",\"rpm\":");
+      logFile.print(values.rpm);
+      logFile.print(",\"inpVoltage\":");
+      logFile.print(values.inpVoltage);
+      logFile.print(",\"ampHours\":");
+      logFile.print(values.ampHours);
+      logFile.print(",\"ampHoursCharged\":");
+      logFile.print(values.ampHoursCharged);
+      logFile.print(",\"tachometer\":");
+      logFile.print(values.tachometer);
+      logFile.print(",\"tachometerAbs\":");
+      logFile.print(values.tachometerAbs);
+      logFile.println("}");
+
+      logFile.close();
+      #ifdef DEBUG
+        Serial.println("done.");
+      #endif
+    } else {
+      #ifdef DEBUG
+        Serial.println("error opening vesc_log.txt");
+      #endif
+      digitalWrite(13, HIGH);
+      delay(200);
+      digitalWrite(13, LOW);
     }
 	} else {
-		Serial.println("Failed to get data!");
+    #ifdef DEBUG
+		  Serial.println("Failed to get data!");
+    #endif
+
+    digitalWrite(13, HIGH);
+    delay(1000);
+    digitalWrite(13, LOW);
 	}
 
-	delay(500);
+	delay(20);
 }
