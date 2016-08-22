@@ -1,15 +1,44 @@
-#VescUartControl library
+#### This fork:
+
+This fork contains just a VESC Data Logger that logs a JSON time via an arduino + SD card module.
+
+{ 
+  t: 0, # time in millis
+  # rpm:
+  
+  # names / keys should be different 
+  #
+  # currents
+  #   motor
+  #   batt_drawn 
+  #   batt_charged
+  #   ...
+  # batt_voltage
+  # ...
+  # ...
+}
+
+---
+
+
+- original readme
+
+## VescUartControl library
 
 Library for arduino to interface over UART with the Vesc BLDC controler (http://vedder.se/2015/01/vesc-open-source-esc/)
 It is used in the ArduBoardControl. Refer here: https://github.com/RollingGecko/ArduBoardControler
 
-The files libraries
+The files libraries:
 
-crc
+- crc
 
-datatypes
+- datatypes
 
-buffer
+- buffer
+
+
+---
+
 
 are directly forked from https://github.com/vedderb/bldc
 
@@ -26,9 +55,9 @@ The needed changes where already merged by Vedder to the FW. :)
 
 In bldc-tool please activate UART and if needed the nunchuk application. 
 
+---
 
-
-##Some details to the UART port used in the VESC
+## Some details to the UART port used in the VESC
 
 It is a uint8_t byte stream. 
 
